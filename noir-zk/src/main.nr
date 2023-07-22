@@ -1,6 +1,8 @@
 use dep::std;
 
-
+// Zk circuit. private input is preimage, public input is hash. 
+// Noir compiler will generate a circuit that proves that preimage hash is equal to public hash
+// Circuit will not see preimage and requires only proof hash is generated correctly
 fn main(preimage : [u8; 2],  hash : pub [u8; 32]) {
     let h = std::hash::sha256(preimage);
     std::println(h);
@@ -9,8 +11,10 @@ fn main(preimage : [u8; 2],  hash : pub [u8; 32]) {
 
 #[test]
 fn test_main() {
-    let preimage = [11081977, 123456789];
-    let hash = [121, 13, 145, 140, 30, 74, 212, 191, 84, 80, 248, 124, 234, 174, 203, 68, 79, 20, 192, 114, 159, 47, 232, 127, 80, 125, 4, 183, 247, 32, 68, 186]
-;
+    // We are using u8 instead of u256 for simplicity but production we should use u256
+    // And a better hashing algo: pedersen hash for example. 
+    // Preimage could be changed to array with n number of elements. 
+    let preimage = [11, 11];
+    let hash = [190, 31, 112, 6, 58, 1, 0, 85, 208, 15, 131, 187, 154, 236, 131, 18, 25, 1, 225, 166, 150, 70, 118, 122, 227, 71, 156, 35, 11, 3, 12, 231];
     main(preimage, hash);
  }

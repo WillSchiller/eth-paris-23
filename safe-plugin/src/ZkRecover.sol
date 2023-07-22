@@ -8,11 +8,6 @@ import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protoc
 import {UltraVerifier} from "@noir-zk/contract/plonk_vk.sol";
 
 contract ZkRecover is BasePluginWithEventMetadata {
-    /**
-     * TODO:
-     * Events
-     * errors
-     */
 
     error ChangeOwnerFailure(bytes reason);
     error VeriferMustBeUniqueAddress(address verifier);
@@ -35,7 +30,7 @@ contract ZkRecover is BasePluginWithEventMetadata {
     constructor()
         BasePluginWithEventMetadata(
             PluginMetadata({
-                name: "Zk Recover Plugin",
+                name: "Zk Recover Plugin Just A Test",
                 version: "1.0.0",
                 requiresRootAccess: true,
                 iconUrl: "",
@@ -75,7 +70,7 @@ contract ZkRecover is BasePluginWithEventMetadata {
         } 
     }
 
-      function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, bytes calldata data, address newOwner, uint256 threshold) external {
+    function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, bytes calldata data, address newOwner, uint256 threshold) external {
         //if (trustedOrigin != address(0) && msg.sender != trustedOrigin) revert UntrustedOrigin(msg.sender);
 
         // We use the hash of the tx to relay has a nonce as this is unique

@@ -9,5 +9,8 @@ remappings = [
     '@noir-zk=../noir-zk'
     ]
 
+[etherscan]
+goerli = { key = "${ETHERSCAN_API_KEY}" }
+
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
