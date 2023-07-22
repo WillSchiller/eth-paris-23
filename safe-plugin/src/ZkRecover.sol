@@ -5,10 +5,10 @@ import {BasePluginWithEventMetadata, PluginMetadata} from "./Base.sol";
 import {ISafe} from "@safe-global/safe-core-protocol/contracts/interfaces/Accounts.sol";
 import {ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
 import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protocol/contracts/DataTypes.sol";
+//import  "./../../noir-zk/contract/plonk_vk.sol";
 
 
-
-contract zkRecover is BasePluginWithEventMetadata {
+contract ZkRecover is BasePluginWithEventMetadata {
     /**
      * TODO:
      * Events
@@ -35,7 +35,7 @@ contract zkRecover is BasePluginWithEventMetadata {
     {
         //https://github.com/safe-global/safe-contracts/blob/main/contracts/base/OwnerManager.sol
         SafeProtocolAction[] memory actions = new SafeProtocolAction[](1);
-        actions[0].to = payable(feeToken);
+        actions[0].to = payable(address(safe));
         actions[0].value = 0;
         actions[0].data = abi.encodeWithSignature("addOwnerWithThreshold(address owner, uint256 _threshold)", newOwner, threshold);
 
@@ -46,7 +46,7 @@ contract zkRecover is BasePluginWithEventMetadata {
     }
 
       function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, bytes calldata data, address newOwner, uint256 threshold) external {
-        if (trustedOrigin != address(0) && msg.sender != trustedOrigin) revert UntrustedOrigin(msg.sender);
+        //if (trustedOrigin != address(0) && msg.sender != trustedOrigin) revert UntrustedOrigin(msg.sender);
 
         // We use the hash of the tx to relay has a nonce as this is unique
         uint256 nonce = uint256(keccak256(abi.encode(this, manager, safe, data)));

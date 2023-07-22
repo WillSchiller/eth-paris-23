@@ -7,12 +7,10 @@ import {ZkRecover} from "../src/ZkRecover.sol";
 
 
 contract Deployer is Script {
-    ZkRecover public zkRecover;
 
      function run() external returns (ZkRecover) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_KEY"));
-        Deployer deployer = new Deployer();
-        zkRecover = deployer.fun();
+        ZkRecover zkRecover = new ZkRecover();
         vm.stopBroadcast();
         return zkRecover;
      } 
