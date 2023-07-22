@@ -6,6 +6,28 @@ import {ISafe} from "@safe-global/safe-core-protocol/contracts/interfaces/Accoun
 import {ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
 import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protocol/contracts/DataTypes.sol";
 
-contract ZkRecover {
+contract zkRecover is BasePluginWithEventMetadata {
  
+/** 
+ * TODO:
+ * Events
+ * errors
+ */
+ constructor() BasePluginWithEventMetadata(
+            PluginMetadata({
+                name: "Zk Recover Plugin",
+                version: "1.0.0",
+                requiresRootAccess: false, // may need to change
+                iconUrl: "",
+                appUrl: "https://github.com/WillSchiller/eth-paris-23"
+            })
+        ){};
+
+        
+
+
+
+
+
+
 }
