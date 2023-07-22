@@ -27,7 +27,7 @@ contract ZkRecoverTest is Test {
     function setUp() public {
         Deployer deployer = new Deployer();
         zkRecoverPlugin = deployer.run();
-        //address(safe).call(abi.encodeWithSignature("enablePlugin(address)", address(manager)));
+        //zkRecoverPlugin = ZkRecover(0x093a7DB7e6D32e2fC9EBAbedB2dFF74318772C59);
         data = abi.encode(
         address(zkRecoverPlugin),
         address(manager),

@@ -5,8 +5,7 @@ import {BasePluginWithEventMetadata, PluginMetadata} from "./Base.sol";
 import {ISafe} from "@safe-global/safe-core-protocol/contracts/interfaces/Accounts.sol";
 import {ISafeProtocolManager} from "@safe-global/safe-core-protocol/contracts/interfaces/Manager.sol";
 import {SafeTransaction, SafeProtocolAction} from "@safe-global/safe-core-protocol/contracts/DataTypes.sol";
-//import  "./../../noir-zk/contract/plonk_vk.sol";
-
+import {UltraVerifier} from "@noir-zk/contract/plonk_vk.sol";
 
 contract ZkRecover is BasePluginWithEventMetadata {
     /**
@@ -16,6 +15,21 @@ contract ZkRecover is BasePluginWithEventMetadata {
      */
 
     error ChangeOwnerFailure(bytes reason);
+    error VeriferMustBeUniqueAddress(address verifier);
+    error VerifierNotUseable(Verifier verifier);
+
+    /**
+     * @dev each owner has a proof verifier contract. To prevent reply attacks verifiers are only useable once. 
+     * Afer which the user must generate a new proof and reset the plugin.
+     * 
+     */
+
+    mapping(address owner => Verifier) private verifiers;
+
+    struct Verifier {
+        address addr;
+        bool useable;
+    }
 
 
     constructor()
@@ -23,12 +37,28 @@ contract ZkRecover is BasePluginWithEventMetadata {
             PluginMetadata({
                 name: "Zk Recover Plugin",
                 version: "1.0.0",
-                requiresRootAccess: false, // may need to change
+                requiresRootAccess: true,
                 iconUrl: "",
                 appUrl: "https://github.com/WillSchiller/eth-paris-23"
             })
-        )
-    {}
+        ){}
+
+    function setproofVerifier(address verifier) external {
+        if (verifiers[msg.sender].addr == verifier) revert VeriferMustBeUniqueAddress(verifier);
+        verifiers[msg.sender].useable = true;
+    }
+    
+    function verifyProof(bytes calldata _proof, bytes32[] calldata _publicInputs) internal returns (bool) {
+       Verifier memory verifier = verifiers[msg.sender];
+        if (verifier.useable == false) revert VerifierNotUseable(verifier);
+        bool proofResult = UltraVerifier(verifier.addr).verify(_proof, _publicInputs);
+        if (proofResult == true) {
+            verifiers[msg.sender] = Verifier({addr: verifier.addr, useable: false});
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     function addOwnerWithThreshold(ISafeProtocolManager manager, ISafe safe, uint256 nonce, address newOwner, uint256 threshold)
         internal
@@ -41,8 +71,8 @@ contract ZkRecover is BasePluginWithEventMetadata {
 
         SafeTransaction memory safeTx = SafeTransaction({actions: actions, nonce: nonce, metadataHash: bytes32(0)});
         try manager.executeTransaction(safe, safeTx) returns (bytes[] memory) {} catch (bytes memory reason) {
-            revert ChangeOwnerFailure(reason);
-        }
+           revert ChangeOwnerFailure(reason); 
+        } 
     }
 
       function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, bytes calldata data, address newOwner, uint256 threshold) external {

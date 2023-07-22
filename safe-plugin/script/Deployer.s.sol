@@ -18,10 +18,8 @@ contract Deployer is Script {
      function run() external returns (ZkRecover) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_KEY"));
         ZkRecover zkRecover = new ZkRecover();
-        //deploymentSafe.enableModule(address(zkRecover));
-        (bool success,) = address(deploymentSafe).delegatecall(abi.encodeWithSignature("enableModule(address)", address(zkRecover)));
-        vm.stopBroadcast();
-         console.log("success: ", success);
+        //(bool success,) = address(deploymentSafe).delegatecall(abi.encodeWithSignature("enableModule(address)", address(zkRecover)));
+        vm.stopBroadcast(); 
         return zkRecover;
      } 
 }
