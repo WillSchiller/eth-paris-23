@@ -1,0 +1,9 @@
+[submodule "safe-plugin/lib/forge-std"]
+	path = safe-plugin/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "safe-plugin/lib/safe-core-protocol"]
+	path = safe-plugin/lib/safe-core-protocol
+	url = https://github.com/5afe/safe-core-protocol
+[submodule "safe-plugin/lib/openzeppelin-contracts"]
+	path = safe-plugin/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
