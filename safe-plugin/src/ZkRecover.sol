@@ -18,19 +18,18 @@ contract ZkRecover is BasePluginWithEventMetadata {
      * Afer which the user must generate a new proof and reset the plugin.
      * 
      */
-
     mapping(address owner => Verifier) private verifiers;
 
     struct Verifier {
         address addr;
-        bool useable;
+        bool void;
     }
 
 
     constructor()
         BasePluginWithEventMetadata(
             PluginMetadata({
-                name: "Zk Recover Plugin Just A Test",
+                name: "Zk Recover Plugin",
                 version: "1.0.0",
                 requiresRootAccess: true,
                 iconUrl: "",
@@ -38,17 +37,17 @@ contract ZkRecover is BasePluginWithEventMetadata {
             })
         ){}
 
-    function setproofVerifier(address verifier) external {
+    function setProofVerifier(address verifier) external {
         if (verifiers[msg.sender].addr == verifier) revert VeriferMustBeUniqueAddress(verifier);
-        verifiers[msg.sender].useable = true;
+        verifiers[msg.sender] = Verifier({addr: verifier, void: true});
     }
     
-    function verifyProof(bytes calldata _proof, bytes32[] calldata _publicInputs) internal returns (bool) {
+    function verifyProof(bytes memory _proof, bytes32[] memory _publicInputs) public returns (bool) {
        Verifier memory verifier = verifiers[msg.sender];
-        if (verifier.useable == false) revert VerifierNotUseable(verifier);
+        if (verifier.void == true) revert VerifierNotUseable(verifier);
         bool proofResult = UltraVerifier(verifier.addr).verify(_proof, _publicInputs);
         if (proofResult == true) {
-            verifiers[msg.sender] = Verifier({addr: verifier.addr, useable: false});
+            verifiers[msg.sender] = Verifier({addr: verifier.addr, void: true});
             return true;
         } else {
             return false;
@@ -64,17 +63,14 @@ contract ZkRecover is BasePluginWithEventMetadata {
         actions[0].value = 0;
         actions[0].data = abi.encodeWithSignature("addOwnerWithThreshold(address owner, uint256 _threshold)", newOwner, threshold);
 
-        SafeTransaction memory safeTx = SafeTransaction({actions: actions, nonce: nonce, metadataHash: bytes32(0)});
+        SafeTransaction memory safeTx = SafeTransaction({actions: actions, nonce: 6, metadataHash: bytes32(0)});
         try manager.executeTransaction(safe, safeTx) returns (bytes[] memory) {} catch (bytes memory reason) {
            revert ChangeOwnerFailure(reason); 
         } 
     }
 
-    function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, bytes calldata data, address newOwner, uint256 threshold) external {
-        //if (trustedOrigin != address(0) && msg.sender != trustedOrigin) revert UntrustedOrigin(msg.sender);
+    function executeFromPlugin(ISafeProtocolManager manager, ISafe safe, uint256 nonce, address newOwner, uint256 threshold) external {
 
-        // We use the hash of the tx to relay has a nonce as this is unique
-        uint256 nonce = uint256(keccak256(abi.encode(this, manager, safe, data)));
         addOwnerWithThreshold(manager, safe, nonce, newOwner, threshold);
     }
 
